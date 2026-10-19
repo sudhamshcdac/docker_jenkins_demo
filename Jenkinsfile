@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         // Corrected username typo from sudhamshdcac to sudhamshcdac to match your GitHub repository
-        GIT_REPOSITORY_URL = 'https://github.com'
+        GIT_REPOSITORY_URL = 'https://github.com/sudhamshcdac/docker_jenkins_demo.git'
         DOCKER_IMAGE_NAME  = 'sudhamshcdac/docker_jenkins_demo'
         IMAGE_TAG          = '1.0'
     }
