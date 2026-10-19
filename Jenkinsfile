@@ -12,7 +12,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        git branch: 'main', url: https://github.com/sudhamshcdac/docker_jenkins_demo.git
+                        git branch: 'main', url: GIT_REPOSITORY_URL
                     } catch (Exception e) {
                         echo "Failed to clone repository: ${e.message}"
                         error "Failed to clone repository"
