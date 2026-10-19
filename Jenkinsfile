@@ -2,10 +2,9 @@ pipeline {
     agent any
 
     environment {
-        // Corrected username typo from sudhamshdcac to sudhamshcdac to match your GitHub repository
         GIT_REPOSITORY_URL = 'https://github.com/sudhamshcdac/docker_jenkins_demo.git'
-        DOCKER_IMAGE_NAME  = 'sudhamshcdac/docker_jenkins_demo'
-        IMAGE_TAG          = '1.0'
+        DOCKER_IMAGE_NAME = 'sudhamshcdac/docker_jenkins_demo'
+        IMAGE_TAG = '1.0'
     }
 
     stages {
@@ -13,8 +12,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Using explicit env scope for script string execution
-                        git branch: 'main', url: "${env.GIT_REPOSITORY_URL}"
+                        git branch: 'main', url: https://github.com/sudhamshcdac/docker_jenkins_demo.git
                     } catch (Exception e) {
                         echo "Failed to clone repository: ${e.message}"
                         error "Failed to clone repository"
@@ -27,8 +25,7 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Added build context root path "." to prevent pipeline workspace resolution bugs
-                        docker.build("${env.DOCKER_IMAGE_NAME}:${env.IMAGE_TAG}", ".")
+                        docker.build("${DOCKER_IMAGE_NAME}:${IMAGE_TAG}")
                     } catch (Exception e) {
                         echo "Failed to build Docker image: ${e.message}"
                         error "Failed to build Docker image"
@@ -41,9 +38,14 @@ pipeline {
             steps {
                 script {
                     try {
-                        // Replaced risky manual 'sh' logins with the native, secure Jenkins Docker plugin wrapper
-                        docker.withRegistry('https://docker.io', 'my-docker-hub-credentials-id') {
-                            docker.image("${env.DOCKER_IMAGE_NAME}:${env.IMAGE_TAG}").push()
+                        withCredentials([usernamePassword(credentialsId: 'my-docker-hub-credentials-id', 
+                                                         usernameVariable: 'DOCKER_USERNAME', 
+                                                         passwordVariable: 'DOCKER_PASSWORD')]) {
+                            // Explicit login before push
+                            sh """
+                            echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                            docker push ${DOCKER_IMAGE_NAME}:${IMAGE_TAG}
+                            """
                         }
                     } catch (Exception e) {
                         echo "Failed to push Docker image to registry: ${e.message}"
@@ -54,4 +56,3 @@ pipeline {
         }
     }
 }
-
